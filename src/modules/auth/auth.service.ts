@@ -43,17 +43,22 @@ export class AuthService {
       const user = await this.userRepository.findByEmail(email);
       console.log(`DB query took: ${Date.now() - dbStart}ms`);
       
-      if (!user) {
-        return null;
-      }
+    if (!user) {
+  return null;
+}
 
-      const hashStart = Date.now();
-      const isPasswordMatch = await bcrypt.compare(pass, user.password_hash);
-      console.log(`Password comparison took: ${Date.now() - hashStart}ms`);
-      
-      if (!isPasswordMatch) {
-        return null;
-      }
+if (!user.password_hash) {
+  return null;
+}
+
+const hashStart = Date.now();
+const isPasswordMatch = await bcrypt.compare(pass, user.password_hash);
+console.log(`Password comparison took: ${Date.now() - hashStart}ms`);
+
+if (!isPasswordMatch) {
+  return null;
+}
+
 
       // Cache the successful login with plain password
       userCache.set(email, {
