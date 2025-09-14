@@ -1,4 +1,4 @@
-// dalam file src/database/migrations/TIMESTAMP_create_initial_tables.ts
+// src/database/migrations/TIMESTAMP_create_initial_tables.ts
 
 import type { Knex } from 'knex';
 
@@ -8,7 +8,8 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.string('name', 255).notNullable();
     table.string('email', 255).notNullable().unique();
-    table.string('password_hash', 255).notNullable();
+    // Made password_hash nullable to allow for Google-only signups
+    table.string('password_hash', 255).nullable(); 
     table.timestamp('last_login_at', { useTz: true });
     table.timestamp('created_at', { useTz: true }).defaultTo(knex.fn.now());
   });
