@@ -1,4 +1,4 @@
-// knexfile.ts
+// knexfile.ts (Replace existing file)
 
 import type { Knex } from 'knex';
 import 'dotenv/config';
@@ -8,7 +8,9 @@ const config: { [key: string]: Knex.Config } = {
     client: 'pg',
     connection: {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: process.env.DATABASE_URL?.includes('neon.tech') ? { 
+        rejectUnauthorized: false 
+      } : false, // Only use SSL for Neon
     },
     migrations: {
       directory: './src/database/migrations',
@@ -17,6 +19,10 @@ const config: { [key: string]: Knex.Config } = {
     seeds: {
       directory: './src/database/seeds',
       extension: 'ts',
+    },
+    pool: {
+      min: 2,
+      max: 10,
     },
   },
 
@@ -31,6 +37,10 @@ const config: { [key: string]: Knex.Config } = {
     },
     seeds: {
       directory: './src/database/seeds',
+    },
+    pool: {
+      min: 2,
+      max: 20,
     },
   },
 };

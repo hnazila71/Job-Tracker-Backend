@@ -3,7 +3,7 @@ import { UserRepository } from './user.repository';
 import { User } from './user.entity';
 
 export class UserService {
-  private readonly saltRounds = 10;
+  private readonly saltRounds = 6;
   private userRepository = new UserRepository();
 
   async hashPassword(password: string): Promise<string> {
