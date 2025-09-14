@@ -1,14 +1,21 @@
-// src/middleware/auth.middleware.ts
+// src/modules/middleware/auth.middleware.ts
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { User } from '../users/user.entity';
 
-// Menambahkan properti 'user' ke tipe Request Express
-export interface AuthRequest extends Request {
-  user?: { id: string; email: string };
+// Augment the Request interface from Express to include the 'user' property.
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: User;
+  }
 }
 
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+export interface AuthRequest extends Request {
+  user?: User;
+}
+
+export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Format: Bearer TOKEN
 
@@ -17,7 +24,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
 
   if (!process.env.JWT_SECRET) {
-    // Error ini penting untuk keamanan
     throw new Error('JWT_SECRET environment variable is not set');
   }
 
@@ -26,7 +32,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
       return res.status(403).json({ message: 'Token tidak valid' });
     }
 
-    req.user = user;
-    next(); // Lanjutkan ke controller jika token valid
+    req.user = user as User;
+    next();
   });
 };
