@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { AuthRequest } from '../../middleware/auth.middleware';
+import { AuthRequest } from '../middleware/auth.middleware';
 import { TrackerRepository } from './tracker.repository';
 
 const repo = new TrackerRepository();

@@ -1,3 +1,5 @@
+// src/modules/auth/auth.controller.ts
+
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 
@@ -11,14 +13,18 @@ export const login = async (req: Request, res: Response) => {
   }
 
   try {
-    const isValid = await authService.validateUser(email, password);
+    const user = await authService.validateUser(email, password);
 
-    if (!isValid) {
+    if (!user) {
       return res.status(401).json({ message: 'Email atau password salah' });
     }
 
-    // Nanti akan kita ganti dengan response token
-    return res.status(200).json({ message: 'Login berhasil!' });
+    // Buat dan kirim token
+    const token = authService.generateToken(user);
+    return res.status(200).json({
+      message: 'Login berhasil!',
+      accessToken: token,
+    });
 
   } catch (error) {
     console.error('Error saat login:', error);

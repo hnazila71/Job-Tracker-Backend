@@ -49,6 +49,7 @@ export class TrackerRepository {
         'DELETE FROM job_applications WHERE id = $1 AND user_id = $2',
         [id, userId]
     );
-    return result.rowCount > 0;
+    // INI BAGIAN YANG DIPERBAIKI
+    return (result.rowCount ?? 0) > 0;
   }
 }
