@@ -5,45 +5,34 @@ export class UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const client = await pool.connect();
     try {
-      // Use prepared statements for better performance
-      const result = await client.query(
-        'SELECT * FROM users WHERE email = $1 LIMIT 1',
-        [email]
-      );
-      
-      if (result.rows.length === 0) return null;
-
-      const dbUser = result.rows[0];
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        password_hash: dbUser.password_hash,
-        last_login_at: dbUser.last_login_at,
-        created_at: dbUser.created_at,
-      };
+      const result = await client.query('SELECT * FROM users WHERE email = $1 LIMIT 1', [email]);
+      return result.rows.length > 0 ? result.rows[0] : null;
     } finally {
-      client.release(); // Always release the client
+      client.release();
     }
   }
 
+  // Method baru untuk mencari berdasarkan Google ID
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    const client = await pool.connect();
+    try {
+      const result = await client.query('SELECT * FROM users WHERE google_id = $1 LIMIT 1', [googleId]);
+      return result.rows.length > 0 ? result.rows[0] : null;
+    } finally {
+      client.release();
+    }
+  }
+
+  // Method create diperbarui untuk menangani pengguna Google
   async create(user: Omit<User, 'id' | 'created_at' | 'last_login_at'>): Promise<User> {
     const client = await pool.connect();
     try {
+      const { name, email, password_hash, google_id } = user;
       const result = await client.query(
-        'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *',
-        [user.name, user.email, user.password_hash]
+        'INSERT INTO users (name, email, password_hash, google_id) VALUES ($1, $2, $3, $4) RETURNING *',
+        [name, email, password_hash || null, google_id || null]
       );
-      
-      const dbUser = result.rows[0];
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        password_hash: dbUser.password_hash,
-        last_login_at: dbUser.last_login_at,
-        created_at: dbUser.created_at,
-      };
+      return result.rows[0];
     } finally {
       client.release();
     }
@@ -52,12 +41,10 @@ export class UserRepository {
   async updateLastLogin(userId: string): Promise<void> {
     const client = await pool.connect();
     try {
-      await client.query(
-        'UPDATE users SET last_login_at = NOW() WHERE id = $1',
-        [userId]
-      );
+      await client.query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [userId]);
     } finally {
       client.release();
     }
   }
 }
+
