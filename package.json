@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
-    "build": "tsc",
-    "start": "node dist/main.js",
-    "db:migrate": "npx knex migrate:latest --knexfile knexfile.ts",
-    "db:seed": "npx knex seed:run --knexfile knexfile.ts",
-    "start:prod": "npm run build && npm run db:migrate && npm start"
-  },
+  "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+  "build": "tsc",
+  "start": "node dist/main.js",
+  "db:migrate": "npx knex migrate:latest --knexfile knexfile.ts",
+  "db:seed": "npx knex seed:run --knexfile knexfile.ts",
+  "postinstall": "npm run build && npm run db:migrate"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

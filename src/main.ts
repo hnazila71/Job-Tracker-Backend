@@ -2,7 +2,7 @@
 
 import express, { Request, Response } from 'express';
 import 'dotenv/config';
-import cors from 'cors'; // <-- 1. Impor cors
+import cors from 'cors';
 
 import userRoutes from './modules/users/user.routes';
 import authRoutes from './modules/auth/auth.routes';
@@ -11,8 +11,26 @@ import trackerRoutes from './modules/tracker/tracker.routes';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
-app.use(cors()); // <-- 2. Gunakan cors (letakkan sebelum rute)
+// --- KONFIGURASI CORS DINAMIS ---
+const allowedOrigins = [
+  'http://localhost:3001', // Izin untuk frontend lokal Anda
+  process.env.FRONTEND_URL // Izin untuk frontend di Vercel (dari .env)
+];
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Izinkan jika origin ada di dalam daftar atau jika origin tidak ada (seperti request dari Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
+// ---------------------------------
+
 app.use(express.json());
 
 // Routes
