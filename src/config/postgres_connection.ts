@@ -1,4 +1,4 @@
-// src/config/postgres_connection.ts (Replace existing file)
+// src/config/postgres_connection.ts (File yang Diperbaiki)
 import { Pool, PoolClient } from 'pg';
 import 'dotenv/config';
 
@@ -14,28 +14,29 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
   
-  // Connection pool settings optimized for Neon
-  max: 10, // Maximum number of clients in the pool
-  min: 2,  // Minimum number of clients in the pool
-  connectionTimeoutMillis: 10000, // 10 seconds connection timeout
-  idleTimeoutMillis: 30000, // 30 seconds idle timeout
-  query_timeout: 30000, // 30 seconds query timeout
+  // Pengaturan connection pool yang dioptimalkan untuk Neon
+  max: 10, // Jumlah maksimum klien di dalam pool
+  min: 2,  // Jumlah minimum klien di dalam pool
+  connectionTimeoutMillis: 10000, // Waktu tunggu koneksi 10 detik
+  idleTimeoutMillis: 30000, // Waktu tunggu idle 30 detik
+  query_timeout: 30000, // Waktu tunggu query 30 detik
   
-  // Important for Neon: Enable keep alive
+  // Penting untuk Neon: Aktifkan keep alive
   keepAlive: true,
   keepAliveInitialDelayMillis: 10000,
   
-  // Application name for monitoring
+  // Nama aplikasi untuk pemantauan
   application_name: 'job_tracker_app',
 });
 
-// Handle pool errors
+// Menangani error pada pool
 pool.on('error', (err: Error, client: PoolClient) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // JANGAN hentikan proses. Cukup catat errornya.
+  // Pool akan menangani pembuangan klien yang rusak.
 });
 
-// Graceful shutdown
+// Penutupan yang anggun (Graceful shutdown)
 process.on('SIGINT', () => {
   pool.end(() => {
     console.log('Pool has ended');
