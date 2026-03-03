@@ -66,4 +66,8 @@ export class UserRepository {
   async updateLastLogin(userId: string): Promise<void> {
     await queryWithRetry('UPDATE users SET last_login_at = NOW() WHERE id = $1', [userId]);
   }
+
+  async updatePasswordHash(userId: string, password_hash: string): Promise<void> {
+    await queryWithRetry('UPDATE users SET password_hash = $1 WHERE id = $2', [password_hash, userId]);
+  }
 }

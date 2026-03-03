@@ -1,13 +1,18 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { login } from '../auth/auth.controller';
+import { register, getProfile, setPassword } from '../users/user.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../users/user.entity';
 
 const router = Router();
 const authService = new AuthService();
 
+router.post('/register', register);
+router.post('/set-password', authMiddleware, setPassword);
 router.post('/login', login);
+router.get('/profile', authMiddleware, getProfile);
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
